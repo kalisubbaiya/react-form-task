@@ -120,6 +120,7 @@ import React, {useState} from 'react'
 const App = () => {
 
   const [task, setTask] = useState([]);
+  const [remove, removeTask] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -127,7 +128,9 @@ const App = () => {
       name: e.target.name.value,
       description: e.target.description.value,
       isPriority: e.target.isPriority.checked,
+      // isPriority: e.target.isPriority1.checked,
       isComplete: e.target.isComplete.checked,
+      // isComplete: e.target.isComplete1.checked,
     };
 
     setTask([...task, newTask]);
@@ -138,12 +141,28 @@ const App = () => {
     e.target.isComplete.checked = "";
   };
 
+  const handleRemove = (index) => {
+    const updatedTasks = [...task];
+    task.splice(index,1);
+    removeTask(updatedTasks);
+    console.log(remove);
+  };
+
+  // const filterPriority = (e) =>{
+  //   if (e.target.name.isPriority1.checked){
+  //     task.filter((item, index)=>{
+  //       return index === task.isPriority.checked
+  //     })
+  //   }
+  // }
+
   return (
     <div className='container'>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="name" placeholder="Task Name" className='width'/> <br />
+        <h1>Task Name</h1>
+        <input type="text" name="name" placeholder="Task Name" className='width' />
+        <h1>Task Description</h1>
         <input type="text" name="description" placeholder="Description" className='width' />
-        <br />
         <input type="checkbox" name="isPriority" /> Is Priority <br/>
         <input type="checkbox" name="isComplete" /> Is Completed <br/>
         <input type="submit" value="Add Task" />
@@ -176,6 +195,11 @@ const App = () => {
                     <input type="checkbox" name="isComplete" />
                   )}
                 </p>
+                <button
+                  onClick={() => handleRemove(index)}
+                >
+                  Remove
+                </button>
               </li>
             );
         })}
