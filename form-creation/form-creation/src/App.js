@@ -120,7 +120,9 @@ import React, {useState} from 'react'
 const App = () => {
 
   const [task, setTask] = useState([]);
-  const [remove, removeTask] = useState("");
+  const [priorityCheck, setPriority] =useState(false);
+  const [completedCheck, setComplete] =useState(false);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -128,9 +130,7 @@ const App = () => {
       name: e.target.name.value,
       description: e.target.description.value,
       isPriority: e.target.isPriority.checked,
-      // isPriority: e.target.isPriority1.checked,
       isComplete: e.target.isComplete.checked,
-      // isComplete: e.target.isComplete1.checked,
     };
 
     setTask([...task, newTask]);
@@ -142,39 +142,58 @@ const App = () => {
   };
 
   const handleRemove = (index) => {
-    const updatedTasks = [...task];
     task.splice(index,1);
-    removeTask(updatedTasks);
-    console.log(remove);
+    setTask([...task]);
   };
 
-  // const filterPriority = (e) =>{
-  //   if (e.target.name.isPriority1.checked){
-  //     task.filter((item, index)=>{
-  //       return index === task.isPriority.checked
-  //     })
-  //   }
-  // }
+  const changeFilter = (e) =>{
+    if (e.target.name === "isPriority1"){
+      setPriority(e.target.checked)
+    } else {
+      setComplete(e.target.checked)
+    }
+  }
+
+  const priorityUpdate = task.filter((e) =>e.isPriority===true)
+
+  const completedUpdate = task.filter((e) =>e.isComplete===true)
+
+
+
+  const update = (item, index) =>{
+    if (item.target.name === "isPriority" || item.target.name === "isPriority1"){
+      task[index].isPriority = item.target.checked;
+    }
+    else if (item.target.name === "isComplete" || item.target.name === "isComplete1"){
+      task[index].isComplete = item.target.checked;
+    }
+    setTask([...task])
+  }
 
   return (
     <div className='container'>
-      <form onSubmit={handleSubmit}>
-        <h1>Task Name</h1>
-        <input type="text" name="name" placeholder="Task Name" className='width' />
-        <h1>Task Description</h1>
-        <input type="text" name="description" placeholder="Description" className='width' />
-        <input type="checkbox" name="isPriority" /> Is Priority <br/>
-        <input type="checkbox" name="isComplete" /> Is Completed <br/>
-        <input type="submit" value="Add Task" />
-      </form>
-      <h1>My Tasks</h1>
-      <input type="checkbox" name="isPriority1" /> {" "}
-      Priority <br/>
-      <input type="checkbox" name="isComplete1" /> {" "}
-      Completed
+      <div className='row'>
+        <form onSubmit={handleSubmit}>
+          <h1>Task Name</h1>
+          <input type="text" name="name" placeholder="Task Name" className='width' />
+          <h1>Task Description</h1>
+          <input type="text" name="description" placeholder="Description" className='width' /> <br />
+          <input type="checkbox" name="isPriority" /> Is Priority <br/>
+          <input type="checkbox" name="isComplete" /> Is Completed <br/><br />
+          <button type="submit">Add Task</button>
+        </form>
+        <div className='filter'>
+          <h1>Filter the Task</h1>
+            <input type="checkbox" name="isPriority1" onChange={changeFilter}/> {" "}
+            Priority <br/> <br />
+            <input type="checkbox" name="isComplete1" onChange={changeFilter}/> {" "}
+            Completed
+        </div>
+      </div>
+      {priorityCheck == false && completedCheck ==false &&(
       <ul>
         {task.map((task, index) => {
-          if (task.name !== "" && task.description !== "")
+          if (task.name !== "" && task.description !== ""){
             return (
               <li key={index}>
                 <h3>Task Name : {task.name}</h3>
@@ -182,17 +201,17 @@ const App = () => {
                 <p>
                   Is Priority :{" "}
                   {task.isPriority ? (
-                    <input type="checkbox" name="isPriority" checked />
+                    <input type="checkbox" name="isPriority1" defaultChecked onChange={(item) =>update(item, index)}/>
                   ) : (
-                    <input type="checkbox" name="isPriority" />
+                    <input type="checkbox" name="isPriority" onChange={(item) =>update(item, index)}/>
                   )}
                 </p>
                 <p>
                   Is Completed :{" "}
                   {task.isComplete ? (
-                    <input type="checkbox" name="isComplete" checked />
+                    <input type="checkbox" name="isComplete1" defaultChecked onChange={(item) =>update(item, index)}/>
                   ) : (
-                    <input type="checkbox" name="isComplete" />
+                    <input type="checkbox" name="isComplete" onChange={(item) =>update(item, index)}/>
                   )}
                 </p>
                 <button
@@ -202,8 +221,77 @@ const App = () => {
                 </button>
               </li>
             );
+          }
         })}
-      </ul>
+      </ul>)}
+      {priorityCheck == true && (
+      <ul>
+        {priorityUpdate.map((task, index) => {
+          if (task.name !== "" && task.description !== ""){
+            return (
+              <li key={index}>
+                <h3>Task Name : {task.name}</h3>
+                <p>Desctiption : {task.description}</p>
+                <p>
+                  Is Priority :{" "}
+                  {task.isPriority ? (
+                    <input type="checkbox" name="isPriority1" defaultChecked onChange={(item) =>update(item, index)}/>
+                  ) : (
+                    <input type="checkbox" name="isPriority" onClick={(item) =>update(item, index)}/>
+                  )}
+                </p>
+                <p>
+                  Is Completed :{" "}
+                  {task.isComplete ? (
+                    <input type="checkbox" name="isComplete1" defaultChecked onChange={(item) =>update(item, index)}/>
+                  ) : (
+                    <input type="checkbox" name="isComplete"  onClick={(item) =>update(item, index)}/>
+                  )}
+                </p>
+                <button
+                  onClick={() => handleRemove(index)}
+                >
+                  Remove
+                </button>
+              </li>
+            );
+          }
+        })}
+      </ul>)}
+      {completedCheck ==true &&(
+      <ul>
+        {completedUpdate.map((task, index) => {
+          if (task.name !== "" && task.description !== ""){
+            return (
+              <li key={index}>
+                <h3>Task Name : {task.name}</h3>
+                <p>Desctiption : {task.description}</p>
+                <p>
+                  Is Priority :{" "}
+                  {task.isPriority ? (
+                    <input type="checkbox" name="isPriority1" defaultChecked onChange={(item) =>update(item, index)}/>
+                  ) : (
+                    <input type="checkbox" name="isPriority" onClick={(item) =>update(item, index)}/>
+                  )}
+                </p>
+                <p>
+                  Is Completed :{" "}
+                  {task.isComplete ? (
+                    <input type="checkbox" name="isComplete1" defaultChecked onChange={(item) =>update(item, index)}/>
+                  ) : (
+                    <input type="checkbox" name="isComplete"  onClick={(item) =>update(item, index)}/>
+                  )}
+                </p>
+                <button
+                  onClick={() => handleRemove(index)}
+                >
+                  Remove
+                </button>
+              </li>
+            );
+          }
+        })}
+      </ul>)}
     </div>
   );
 };
